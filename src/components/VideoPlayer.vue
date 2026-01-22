@@ -3,7 +3,7 @@
   import videoFileSrc from '@/assets/videos/example.mp4'
 
   const props = defineProps({
-    seekTime: {
+    selectedTime: {
       type: Number
     }
   })
@@ -26,32 +26,35 @@
     })
   })
 
-  watch(() => props.seekTime, (time) => {
-    if (time == null || !videoRef.value) return
+  watch(
+  () => props.selectedTime,
+  (time) => {
+    if (time == null || !videoRef.value) {
+      return
+    }
     videoRef.value.currentTime = time
   })
-
 </script>
 
 <template>
-  <div class="container">
+  <div class="video-player">
     <video
         class="video"
         ref="videoRef"
         :src="videoFileSrc"
         controls
-        width="688"
-        height="472"
     />
   </div>
 </template>
 
 <style scoped>
-  .container {
+  .video-player {
     display: flex;
     justify-content: center;
   }
   .video {
-    object-fit: cover;
+    object-fit: contain;
+    width: 90%;
+    height: auto;
   }
 </style>

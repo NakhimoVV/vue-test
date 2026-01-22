@@ -1,11 +1,11 @@
 <script setup>
-  import {ref} from 'vue'
+  import { ref } from 'vue'
   import VideoPlayer from '@/components/VideoPlayer.vue'
   import TimelineChart from "@/components/TimelineChart.vue";
 
   const duration = ref(0)
   const currentTime = ref(0)
-  const seekTime = ref(null)
+  const selectedTime = ref(null)
 
   const onVideoLoaded = (value) => {
     duration.value = value
@@ -15,14 +15,14 @@
     currentTime.value = time
   }
 
-  const onSeek = (second) => {
-    seekTime.value = second
+  const onSelectTime = (time) => {
+    selectedTime.value = time
   }
 </script>
 
 <template>
   <VideoPlayer
-    :seekTime="seekTime"
+    :selectedTime="selectedTime"
     @loaded="onVideoLoaded"
     @timeUpdate="onTimeUpdate"
   />
@@ -30,7 +30,7 @@
     v-if="duration"
     :duration="duration"
     :currentTime="currentTime"
-    @seek="onSeek"
+    @selectTime="onSelectTime"
   />
   <p v-else>Видео не загрузилось!</p>
 </template>
