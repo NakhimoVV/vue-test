@@ -15,27 +15,41 @@
   const createChart = () => {
     const bodyChart = chartRef.value.getContext('2d')
 
-    const labels = Array.from(
-        { length: props.duration + 1 },
-        (_, i) => i
-    )
+    // генерируем ось Х
+    const data = Array.from({ length: 200 }, (_, i) => ({
+      x: (props.duration / 200) * i,
+      y: 0
+    }))
 
     chart = new Chart(bodyChart, {
       type: 'line',
       data: {
-        labels,
         datasets: [{
-          label: 'Video timeline',
-          data: labels,
-          borderColor: 'rgb(75, 192, 192)',
-          tension: 0
+          data,
+          borderColor: 'rgb(75,192,192)',
+          pointRadius: 3,
+          showLine: true
         }]
       },
       options: {
         animation: false,
+        scales: {
+          y: {
+            display: false
+          },
+          x: {
+            type: 'linear',
+            min: 0,
+            max: props.duration,
+            ticks: {
+              callback: (value) => `${value}s`
+            }
+          }
+        },
         onClick(_, elements) {
           if (!elements.length) return
-          emit('seek', elements[0].index)
+          const point = chart.data.datasets[0].data[elements[0].index]
+          emit('seek', point.x)
         }
       }
     })
@@ -43,12 +57,24 @@
 
   onMounted(createChart)
 
+  function findNearestPointIndex(time) {
+    const data = chart.data.datasets[0].data
+
+    const index = data.findIndex(p => p.x >= time)
+    return index === -1 ? data.length - 1 : index
+  }
+
   watch(
       () => props.currentTime,
       (time) => {
         if (!chart) return
-        chart.setActiveElements([{ datasetIndex: 0, index: time }])
-        chart.update()
+        chart.setActiveElements([
+          {
+            datasetIndex: 0,
+            index: findNearestPointIndex(time)
+          }
+        ])
+        chart.update('none')
       }
   )
 

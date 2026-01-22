@@ -5,23 +5,24 @@
 
   const duration = ref(0)
   const currentTime = ref(0)
+  const seekTime = ref(null)
 
   const onVideoLoaded = (value) => {
-    duration.value = Math.floor(value)
+    duration.value = value
   }
 
   const onTimeUpdate = (time) => {
-    currentTime.value = Math.floor(time)
+    currentTime.value = time
   }
 
   const onSeek = (second) => {
-    currentTime.value = second
+    seekTime.value = second
   }
 </script>
 
 <template>
   <VideoPlayer
-    :currentTime="currentTime"
+    :seekTime="seekTime"
     @loaded="onVideoLoaded"
     @timeUpdate="onTimeUpdate"
   />
@@ -31,6 +32,7 @@
     :currentTime="currentTime"
     @seek="onSeek"
   />
+  <p v-else>Видео не загрузилось!</p>
 </template>
 
 <style scoped></style>

@@ -3,9 +3,8 @@
   import videoFileSrc from '@/assets/videos/example.mp4'
 
   const props = defineProps({
-    currentTime: {
-      type: Number,
-      required: true
+    seekTime: {
+      type: Number
     }
   })
 
@@ -27,10 +26,8 @@
     })
   })
 
-  watch(() => props.currentTime, (time) => {
-    if (!videoRef.value) {
-      return
-    }
+  watch(() => props.seekTime, (time) => {
+    if (time == null || !videoRef.value) return
     videoRef.value.currentTime = time
   })
 
