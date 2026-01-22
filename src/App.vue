@@ -35,4 +35,9 @@
   <p v-else>Видео не загрузилось!</p>
 </template>
 
-<style scoped></style>
+<style>
+  #app {
+    display: grid;
+    row-gap: 20px;
+  }
+</style>

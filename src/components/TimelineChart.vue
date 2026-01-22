@@ -1,5 +1,5 @@
 <script setup>
-  import {ref, onMounted, onUnmounted, watch } from "vue";
+  import { ref, onMounted, onUnmounted, watch } from "vue";
   import Chart from 'chart.js/auto'
 
   const props = defineProps({
@@ -15,41 +15,63 @@
   const createChart = () => {
     const bodyChart = chartRef.value.getContext('2d')
 
-    // генерируем ось Х
-    const data = Array.from({ length: 200 }, (_, i) => ({
-      x: (props.duration / 200) * i,
-      y: 0
-    }))
-
     chart = new Chart(bodyChart, {
       type: 'line',
       data: {
-        datasets: [{
-          data,
-          borderColor: 'rgb(75,192,192)',
-          pointRadius: 3,
-          showLine: true
-        }]
+        datasets: [
+          // Unplayed line
+          {
+            data: [
+              { x: 0, y: 1 },
+              { x: props.duration, y: 1 }
+            ],
+            borderColor: '#444',
+            borderWidth: 12,
+            pointRadius: 0
+          },
+          // Played line
+          {
+            data: [
+              { x: 0, y: 1 },
+              { x: 0, y: 1 }
+            ],
+            borderColor: '#42b883',
+            borderWidth: 24,
+            pointRadius: 0
+          }
+        ]
       },
       options: {
         animation: false,
+        responsive: true,
+        maintainAspectRatio: false,
         scales: {
           y: {
-            display: false
+            display: false,
+            min: 0,
+            max: 1
           },
           x: {
             type: 'linear',
             min: 0,
             max: props.duration,
             ticks: {
-              callback: (value) => `${value}s`
+              callback: v => `${Math.floor(v)}s`
             }
           }
         },
-        onClick(_, elements) {
-          if (!elements.length) return
-          const point = chart.data.datasets[0].data[elements[0].index]
-          emit('seek', point.x)
+        interaction: {
+          mode: 'nearest',
+          axis: 'x',
+          intersect: false
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false }
+        },
+        onClick(event) {
+          const x = chart.scales.x.getValueForPixel(event.x)
+          emit('seek', x)
         }
       }
     })
@@ -57,23 +79,11 @@
 
   onMounted(createChart)
 
-  function findNearestPointIndex(time) {
-    const data = chart.data.datasets[0].data
-
-    const index = data.findIndex(p => p.x >= time)
-    return index === -1 ? data.length - 1 : index
-  }
-
   watch(
       () => props.currentTime,
-      (time) => {
+      time => {
         if (!chart) return
-        chart.setActiveElements([
-          {
-            datasetIndex: 0,
-            index: findNearestPointIndex(time)
-          }
-        ])
+        chart.data.datasets[1].data[1].x = time
         chart.update('none')
       }
   )
@@ -84,14 +94,15 @@
 </script>
 
 <template>
-  <div class="inner-chart">
+  <div class="timeline">
     <canvas ref="chartRef"></canvas>
   </div>
 </template>
 
 <style scoped>
-.inner-chart {
-  width: 70%;
-  margin-inline: auto;
-}
+  .timeline {
+    width: 70%;
+    height: 50px;
+    margin-inline: auto;
+  }
 </style>

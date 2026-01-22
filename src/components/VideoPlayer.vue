@@ -47,11 +47,11 @@
 </template>
 
 <style scoped>
-.container {
-  display: flex;
-  justify-content: center;
-}
-.video {
-  object-fit: cover;
-}
+  .container {
+    display: flex;
+    justify-content: center;
+  }
+  .video {
+    object-fit: cover;
+  }
 </style>
